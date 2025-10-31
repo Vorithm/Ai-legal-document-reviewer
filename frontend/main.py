@@ -3,24 +3,18 @@ import requests
 import os
 
 # 🌐 Backend URL (update if hosted elsewhere)
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = (f"{os.getenv('BACKEND_URL')}" if os.getenv('BACKEND_URL') else "http://localhost:8000")
 
 st.set_page_config(page_title="AI Legal Document Reviewer", layout="wide")
 
-# --------------------------------------
 # HEADER
-# --------------------------------------
 st.title("AI Legal Document Reviewer")
 st.markdown("Upload a **contract, NDA, or policy document** to identify key clauses, risks, and legal compliance issues.")
 
 
-# --------------------------------------
 # FILE UPLOAD
-# --------------------------------------
 st.header(" Step 1: Upload Contract")
-
 uploaded_file = st.file_uploader("Upload your legal document (PDF)", type=["pdf"])
-
 if uploaded_file:
     st.info("Uploading document... please wait ⏳")
 
@@ -45,7 +39,6 @@ else:
 
 # --------------------------------------
 # QUERY SECTION
-# --------------------------------------
 if "document_id" in st.session_state:
     st.header("Step 2: Ask Legal Questions")
 
