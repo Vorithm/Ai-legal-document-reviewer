@@ -3,7 +3,7 @@ import requests
 import os
 
 # 🌐 Backend URL (update if hosted elsewhere)
-BACKEND_URL = (f"{os.getenv('BACKEND_URL')}" if os.getenv('BACKEND_URL') else "http://localhost:8000")
+BACKEND_URL = (f"{os.getenv('BACKEND_URL')}" if os.getenv('BACKEND_URL') else "https://ai-legal-document-reviewer.onrender.com")
 
 st.set_page_config(page_title="AI Legal Document Reviewer", layout="wide")
 
