@@ -1,20 +1,34 @@
+
 import streamlit as st
 import requests
 import os
 
+
 # 🌐 Backend URL (update if hosted elsewhere)
-BACKEND_URL = (f"{os.getenv('BACKEND_URL')}" if os.getenv('BACKEND_URL') else "https://ai-legal-document-reviewer.onrender.com")
+BACKEND_URL = (f"{os.getenv('BACKEND_URL')}" if os.getenv('BACKEND_URL') else "http:localhost:8000")
 
 st.set_page_config(page_title="AI Legal Document Reviewer", layout="wide")
 
+# --------------------------------------
 # HEADER
+# --------------------------------------
 st.title("AI Legal Document Reviewer")
-st.markdown("Upload a **contract, NDA, or policy document** to identify key clauses, risks, and legal compliance issues.")
+st.info("📘 Are you overwhelmed by long job contracts or complex legal documents? 🤯 Don't worry — this app helps you **understand your contract**, **spot missing or risky clauses**, and **check its alignment with the Indian Contract Act**. Just upload your **contract, NDA, or policy**, and get clear, reliable insights instantly!")
 
 
+# --------------------------------------
 # FILE UPLOAD
+# --------------------------------------
 st.header(" Step 1: Upload Contract")
+
 uploaded_file = st.file_uploader("Upload your legal document (PDF)", type=["pdf"])
+
+def upload_pdf(file_path, file_name="sample_contract.pdf"):
+    with open(file_path, "rb") as f:
+        files = {"file": (file_name, f, "application/pdf")}
+        response = requests.post(f"{BACKEND_URL}/upload", files=files)
+    return response
+
 if uploaded_file:
     st.info("Uploading document... please wait ⏳")
 
@@ -35,10 +49,43 @@ if uploaded_file:
         st.error("❌ Failed to upload document.")
 else:
     st.warning("Please upload a PDF to begin.")
+    
+    st.markdown("Or try it out instantly with our demo contract:")
+    sample_path = "sample_contract.pdf"
+
+    # Download or ensure a sample PDF exists locally
+
+    col1, col2 = st.columns([1, 1.2])
+
+    with col1:
+        try_sample = st.button("📄 Try with Sample Contract")
+
+    with col2:
+        with open(sample_path, "rb") as f:
+            st.download_button(
+                label="⬇️ Download Sample Contract",
+                data=f,
+                file_name="sample_contract.pdf",
+                mime="application/pdf",
+                help="Download a copy of the sample contract for review"
+            )
+
+    # --- Handle sample contract upload when clicked ---
+    if try_sample:
+        st.info("Uploading sample contract... please wait ⏳")
+        response = upload_pdf(sample_path)
+        if response.status_code == 200:
+            data = response.json()
+            document_id = data["document_id"]
+            st.success("✅ Sample contract uploaded and indexed successfully!")
+            st.session_state["document_id"] = document_id
+        else:
+            st.error("❌ Failed to upload sample contract.")
 
 
 # --------------------------------------
 # QUERY SECTION
+# --------------------------------------
 if "document_id" in st.session_state:
     st.header("Step 2: Ask Legal Questions")
 
